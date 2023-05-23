@@ -5,9 +5,9 @@ This is a simple JavaScript QR code generator that allows you to generate QR cod
 
 ## Features
 
-Generates QR codes using JavaScript
-Customizable QR code parameters such as size, error correction level, and data encoding
-Supports multiple data types including text, URLs, email addresses, phone numbers, and more
-Provides an easy-to-use API for generating QR codes programmatically
-Lightweight and easy to integrate into existing projects
-Works in modern web browsers
++ Generates QR codes using JavaScript
++Customizable QR code parameters such as size, error correction level, and data encoding
++Supports multiple data types including text, URLs, email addresses, phone numbers, and more
++Provides an easy-to-use API for generating QR codes programmatically
++Lightweight and easy to integrate into existing projects
++Works in modern web browsers
