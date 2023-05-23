@@ -10,3 +10,5 @@
 + Provides an easy-to-use API for generating QR codes programmatically
 + Lightweight and easy to integrate into existing projects
 + Works in modern web browsers
+
+### Visit this project at: https://sanketdhengre.github.io/JAVASCRIPT-QR_CODE_GENERATOR/
