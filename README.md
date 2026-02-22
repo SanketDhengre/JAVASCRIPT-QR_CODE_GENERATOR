@@ -1,76 +1,60 @@
-# ⬛ QR Studio Pro v4.0
+# 🍎 QR Studio: Designer Edition (v5.0)
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built%20With-HTML%20%7C%20CSS%20%7C%20JavaScript-black?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Design-Glassmorphism%20Studio-blueviolet?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Library-QR%20Code%20Styling-orange?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Version-4.0-green?style=for-the-badge" />
-</p>
-
-<p align="center">
-  The ultimate, Silicon Valley-grade QR Code design studio.  
-  Generate, brand, and export high-fidelity QR codes with logos, gradients, and professional templates — entirely offline.
+  <img src="https://img.shields.io/badge/Release-v5.0%20%7C%20Designer%20Edition-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Design-Industrial%20Apple%20Aesthetic-blue?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/UX-Zero%20Scroll%20Experience-green?style=for-the-badge" />
 </p>
 
 ---
 
-## 🔥 What's New in v4.0
+## 🏆 The World's Most Elegant QR Studio
 
-The massive v4.0 "Studio" release transforms the simple generator into a full-scale creative tool.
+Designer Edition (v5.0) is a ground-up reimagining of what a developer utility can be. It is built with the industrial design principles of Cupertino: **Precision, Spacing, and Intent.**
 
-### 🖼️ Branding & Logos
-- **Logo Embedding**: Upload custom PNG, JPG, or SVG icons to sit in the center of your QR code.
-- **Hide Background Dots**: Smart detection to remove dots behind the logo for better clarity.
-- **Logo Scaling**: Dynamic slider to adjust the softness and size of your brand mark.
+### ✨ Key Upgrades in v5.0
 
-### 📡 Professional Templates
-Dedicated input forms for common use cases:
-- **WiFi Template**: Auto-format `WIFI:S:ssid;T:WPA;P:password;;` payloads.
-- **vCard Template**: Full contact card generation (Name, Phone, Email, Org).
-- **URL & Socials**: Quick-load templates for GitHub, LinkedIn, and WhatsApp.
+#### 1. 🍎 Apple-Level Industrial Design
+- **Zero-Scroll Architecture**: On desktop, the app is engineered to fit perfectly within a single viewport. No global scrollbars, ever.
+- **Glassmorphism 2.0**: High-refraction blurs (`saturate(180%) blur(20px)`) and organic borders create a deep sense of hierarchy.
+- **SF-Inspired Typography**: Leverages high-fidelity system fonts for an integrated, native macOS/iOS feel.
 
-### 🎨 Advanced Design Engine
-- **SVG Vector Export**: Export as infinitely scalable SVG — perfect for professional printing.
-- **Liquid & Artistic Patterns**: 6 distinct module styles including `Liquid`, `Classy`, and `Artistic`.
-- **Gradient Flow**: Complex linear gradient support for dots and corners.
-- **Dual-Color Control**: Full hex-code support for both foreground modules and background surface.
+#### 2. 📱 Absolute Responsiveness
+- **Adaptive Studio Container**: Flawlessly transitions from a 2-column professional dashboard on desktop to a single-column mobile workspace.
+- **Touch-First Controls**: Large interactive surfaces, soft-touch buttons, and native iOS-style input groups.
 
-### ⚡ Power UX
-- **Live Preview**: QR updates instantly as you type (debounced for performance).
-- **Scan-Me Frame**: Optional decorative footer border with a "SCAN ME" call-to-action.
-- **Generation History**: Local state tracking stores your last 5 designs for instant recall.
-- **Config Sharing**: One-click "Share" button generates a URL that encodes your current template and content.
-- **Copy-to-Clipboard**: Direct PNG copy to system clipboard for instant pasting into Slack/Figma.
+#### 3. 🛠️ Pro-Grade Tooling
+- **Designer Presets**: 6 curated patterns including `Artistic`, `Liquid`, and `Classy`.
+- **High-Fidelity Branding**: Drop any brand icon into the center with smart background-dot clipping.
+- **Vector & Master Exports**: One-tap export to professional PNG or infinitely scalable SVG.
+- **Native Clipboard Integration**: "Copy Image" sends the high-res PNG directly to your system clipboard for instant use in Slack, Figma, or Mail.
 
 ---
 
-## �️ Preview
+## 🖥️ Layout Anatomy
 
-> A high-end split-panel interface: Live output engine on the left, tabbed customization dashboard (Template, Design, Branding) on the right.
+- **The Preview Arena (Left)**: A high-precision display for your output, accompanied by instant action buttons.
+- **The Design Engine (Right)**: A tabbed interface (`Content`, `Style`, `Branding`) that keeps configuration clean and logical.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Experience the Quality
 
 ```bash
 git clone https://github.com/SanketDhengre/JAVASCRIPT-QR_CODE_GENERATOR.git
 cd JAVASCRIPT-QR_CODE_GENERATOR
-start index.html
+
+# Open in your browser of choice
+open index.html
 ```
 
 ---
 
 ## 📐 Design Philosophy
 
-v4.0 follows the **"Pro Utility"** standard:
-1. **Side-by-Side Context**: Never lose sight of the result while configuring styles.
-2. **Zero Backend**: 100% privacy. All rendering happens in your browser—no data is ever sent to a server.
-3. **Motion-Driven Feedback**: Toasts, shakes, and slide-in animations provide a cohesive high-end feel.
+> *"Details matter. It's worth waiting to get it right."* — Steve Jobs
+
+v5.0 is the result of ruthless simplification. Every border-radius, every shadow-blur, and every transition timing has been tuned to feel deliberate. 
 
 ---
-
-## 📄 License
-MIT License. Feel free to use and extend.
-
----
-**Engineered with precision by Sanket Dhengre.**
+**Designed with obsession by Sanket Dhengre.**

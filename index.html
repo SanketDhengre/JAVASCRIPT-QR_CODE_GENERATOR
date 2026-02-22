@@ -2,750 +2,669 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Studio Pro — The Ultimate QR Design Tool</title>
-    <meta name="description" content="Professional QR Code Studio. Style, brand, and generate high-fidelity QR codes with logos, gradients, and templates.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>QR Studio Pro — Designer Edition</title>
+    <meta name="description" content="The world's most elegant QR code design studio. Apple-level aesthetics with high-fidelity control.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
 
     <style>
-        /* ─── Design Tokens ─────────────────────────────────────────── */
+        /* ─── Apple Design System ───────────────────────────────────── */
         :root {
-            --bg:            #040406;
-            --surface:       rgba(18, 18, 24, 0.7);
-            --surface-elev:  rgba(30, 30, 42, 0.85);
-            --border:        rgba(255,255,255,0.06);
-            --border-active: rgba(139,92,246,0.5);
-            --text:          #f8fafc;
-            --text-dim:      #94a3b8;
-            --accent:        #8b5cf6;
-            --accent-glow:   rgba(139,92,246,0.3);
-            --success:       #10b981;
+            --bg: #000000;
+            --card-bg: rgba(28, 28, 30, 0.7);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent: #007aff;
+            --accent-soft: rgba(0, 122, 255, 0.15);
+            --glass: saturate(180%) blur(20px);
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --safe-area: env(safe-area-inset-bottom);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
-        
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         body {
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 16px;
-            position: relative;
-            overflow-x: hidden;
-            overflow-y: auto;
-        }
-
-        /* ─── Background Effects ─────────────────────────────────────── */
-        .ambient-glow {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            background: 
-                radial-gradient(circle at 10% 10%, rgba(139,92,246,0.1) 0%, transparent 40%),
-                radial-gradient(circle at 90% 90%, rgba(59,130,246,0.08) 0%, transparent 40%);
-        }
-
-        /* ─── Layout ─────────────────────────────────────────────────── */
-        .studio-container {
-            position: relative;
-            z-index: 10;
-            width: 100%;
-            max-width: 900px;
-            display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 24px;
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* ─── Left Panel: Display ────────────────────────────────────── */
-        .panel-preview {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 32px;
-            backdrop-filter: blur(20px);
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            align-items: center;
-            justify-content: flex-start;
-        }
-
-        .qr-wrapper {
-            width: 100%;
-            aspect-ratio: 1;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100dvh;
             overflow: hidden;
-            transition: all 0.5s ease;
-        }
-
-        .qr-wrapper.active {
-            background: #ffffff;
-            border-color: rgba(255,255,255,0.2);
-            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.1);
-        }
-
-        .scan-me-label {
-            position: absolute;
-            bottom: 12px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: #000;
-            text-transform: uppercase;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .qr-wrapper.framed .scan-me-label { opacity: 1; }
-
-        #canvas-buffer { transform: scale(0.9); transition: transform 0.4s; }
-        .qr-wrapper.active #canvas-buffer { transform: scale(1); }
-
-        .preview-actions {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .btn-group-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .action-btn {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
+            background-image: 
+                radial-gradient(circle at 0% 0%, #1c1c1e 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, #1c1c1e 0%, transparent 40%);
         }
 
-        .action-btn:hover:not(:disabled) {
-            background: rgba(255,255,255,0.08);
-            border-color: var(--border-active);
+        /* ─── Main Container ────────────────────────────────────────── */
+        .studio-root {
+            width: 100%;
+            height: 100%;
+            max-width: 1024px;
+            max-height: 720px;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            padding: 24px;
+            gap: 20px;
+            animation: appEntry 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
         }
 
-        .action-btn:disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
+        @keyframes appEntry {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
-        /* ─── Right Panel: Dashboard ────────────────────────────────── */
-        .panel-dashboard {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 28px;
-            padding: 4px;
-            backdrop-filter: blur(20px);
+        /* ─── Shared Card Style ─────────────────────────────────────── */
+        .apple-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            backdrop-filter: var(--glass);
+            -webkit-backdrop-filter: var(--glass);
             display: flex;
             flex-direction: column;
+            overflow: hidden;
         }
 
-        .tabs-header {
+        /* ─── Left: High-Precision Display ─────────────────────────── */
+        .display-panel {
+            padding: 40px 32px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-brand {
+            width: 100%;
+            text-align: center;
+        }
+
+        .header-brand h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .header-brand p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .qr-viewport {
+            width: 260px;
+            height: 260px;
+            background: #fff;
+            border-radius: var(--radius-lg);
             display: flex;
-            padding: 12px;
-            gap: 4px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative;
+            transition: transform 0.4s cubic-bezier(0.1, 0.9, 0.2, 1);
         }
 
-        .tab-trigger {
-            flex: 1;
-            padding: 10px;
-            background: transparent;
+        .qr-viewport:active { transform: scale(0.97); }
+
+        .display-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .primary-button {
+            background: var(--text-primary);
+            color: var(--bg);
             border: none;
-            color: var(--text-dim);
-            font-size: 12px;
+            height: 48px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .primary-button:hover { opacity: 0.92; transform: translateY(-1px); }
+        .primary-button:active { transform: translateY(0); }
+
+        .secondary-button {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+            height: 48px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .secondary-button:hover { background: rgba(255,255,255,0.1); }
+
+        /* ─── Right: Customization Engine ─────────────────────────── */
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-tabs {
+            display: flex;
+            padding: 8px;
+            gap: 4px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .nav-tabs button {
+            flex: 1;
+            padding: 10px;
             border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
             transition: all 0.2s;
         }
 
-        .tab-trigger.active {
-            background: var(--surface-elev);
-            color: var(--text);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        .nav-tabs button.active {
+            background: rgba(255,255,255,0.08);
+            color: var(--text-primary);
         }
 
-        .tab-content {
-            padding: 24px;
-            display: none;
-            animation: fadeIn 0.3s ease;
-            height: 480px;
+        .tab-scroll {
+            flex: 1;
             overflow-y: auto;
+            padding: 32px;
+            scrollbar-width: thin;
         }
 
-        .tab-content.active { display: block; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .section {
+            margin-bottom: 32px;
         }
 
-        /* ─── Components ────────────────────────────────────────────── */
-        .section-row { margin-bottom: 24px; }
         .section-label {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
-            color: var(--text-dim);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 12px;
+            margin-bottom: 16px;
             display: block;
         }
 
-        .input-group { margin-bottom: 16px; position: relative; }
-        .input-group label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--text-dim); }
-        
-        input, select, textarea {
-            width: 100%;
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 12px 16px;
-            border-radius: 12px;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
+        /* ─── Form Controls ────────────────────────────────────────── */
+        .input-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-group {
+            background: rgba(255,255,255,0.05);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--card-border);
+            padding: 4px 16px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            padding-top: 8px;
+        }
+
+        .input-group input, .input-group select, .input-group textarea {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 15px;
+            padding: 8px 0 10px;
+            font-family: inherit;
             outline: none;
-            transition: border-color 0.2s;
         }
 
-        input:focus, select:focus { border-color: var(--accent); }
-
-        .type-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .type-btn {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            padding: 12px 4px;
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .type-btn.active {
-            background: var(--surface-elev);
-            border-color: var(--accent);
-            color: var(--accent);
-        }
-
-        .type-btn svg { width: 18px; height: 18px; margin-bottom: 6px; }
-        .type-btn span { font-size: 11px; font-weight: 600; display: block; }
-
-        .preset-grid {
+        .style-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-
-        .style-tile {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .style-tile.active { border-color: var(--accent); background: rgba(139,92,246,0.05); }
-        .style-tile .preview-icon { height: 40px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
-
-        .color-pickers { display: flex; gap: 12px; }
-        .color-item { flex: 1; }
-
-        .logo-upload-box {
-            border: 2px dashed var(--border);
-            border-radius: 16px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .logo-upload-box:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
-
-        .history-list {
-            display: flex;
             gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 8px;
         }
 
-        .history-item {
-            flex: 0 0 60px;
-            height: 60px;
-            background: #fff;
-            border-radius: 8px;
-            padding: 4px;
+        .style-item {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-md);
+            padding: 16px 8px;
+            text-align: center;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: all 0.2s;
         }
 
-        .history-item:hover { transform: scale(1.1); }
-        .history-item img { width: 100%; height: 100%; object-fit: contain; }
+        .style-item.active {
+            background: var(--accent-soft);
+            border-color: var(--accent);
+        }
+
+        .style-item .icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .style-item span {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .color-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .color-item {
+            flex: 1;
+            background: rgba(255,255,255,0.04);
+            border-radius: var(--radius-md);
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .color-item input[type="color"] {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .color-item span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* ─── Footer Action ────────────────────────────────────────── */
+        .bottom-bar {
+            padding: 16px 32px;
+            border-top: 1px solid var(--card-border);
+            background: rgba(255,255,255,0.02);
+        }
 
         /* ─── Toast ───────────────────────────────────────────────────── */
         #toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
-            background: var(--surface-elev); border: 1px solid var(--border-active);
-            padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 500;
-            transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
-            z-index: 999;
+            position: fixed;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: rgba(255,255,255,0.95);
+            color: #000;
+            backdrop-filter: blur(10px);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: all 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 9999;
         }
-        #toast.visible { transform: translateX(-50%) translateY(0); }
 
-        /* ─── Scrollbar ───────────────────────────────────────────────── */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        #toast.active { transform: translateX(-50%) translateY(0); }
+
+        /* ─── Responsive & Height Optimization ───────────────────────── */
+        @media (max-width: 820px) {
+            .studio-root {
+                grid-template-columns: 1fr;
+                height: 100dvh;
+                max-height: none;
+                padding: 12px;
+                display: flex;
+                flex-direction: column;
+                overflow-y: auto;
+            }
+
+            .display-panel {
+                padding: 24px 20px;
+                gap: 20px;
+            }
+
+            .qr-viewport {
+                width: 200px;
+                height: 200px;
+            }
+
+            .nav-tabs {
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                background: var(--card-bg);
+            }
+        }
+
+        /* Ruthless Scroll Removal for Desktops */
+        @media (min-height: 700px) and (min-width: 821px) {
+            body { overflow: hidden; }
+        }
+
+        .hidden { display: none !important; }
+
+        /* Custom scrollbar for tab-scroll */
+        .tab-scroll::-webkit-scrollbar { width: 4px; }
+        .tab-scroll::-webkit-scrollbar-track { background: transparent; }
+        .tab-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<div class="ambient-glow"></div>
+<div id="toast">Copied to clipboard</div>
 
-<div class="studio-container">
+<div class="studio-root">
     
-    <!-- LEFT PANEL -->
-    <div class="panel-preview">
-        <div style="text-align: left; width: 100%;">
-            <p style="font-size: 14px; font-weight: 700;">QR STUDIO <span style="color: var(--accent);">PRO</span></p>
-            <p style="font-size: 11px; color: var(--text-dim);">Live Output Engine v4.0</p>
+    <!-- LEFT: DISPLAY -->
+    <div class="apple-card display-panel">
+        <div class="header-brand">
+            <h1>QR Studio</h1>
+            <p>DESIGNER EDITION</p>
         </div>
 
-        <div class="qr-wrapper" id="qr-frame">
-            <div id="canvas-buffer"></div>
-            <div class="scan-me-label">SCAN ME</div>
+        <div class="qr-viewport" id="qr-container">
+            <!-- QR Canvas Injected Here -->
+            <div id="placeholder-text" style="color: #000; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.2;">Preview Arena</div>
         </div>
 
-        <div class="preview-actions">
-            <div class="btn-group-row">
-                <button class="action-btn" id="btn-copy" onclick="copyToClipboard()" disabled>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    Copy
-                </button>
-                <button class="action-btn" id="btn-share" onclick="shareWorkspace()">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
-                    Share
-                </button>
+        <div class="display-actions">
+            <button class="secondary-button" id="btn-copy" onclick="copyPng()" disabled>
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                Copy Image
+            </button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button class="secondary-button" id="btn-png" onclick="download('png')" disabled>PNG</button>
+                <button class="secondary-button" id="btn-svg" onclick="download('svg')" disabled>SVG</button>
             </div>
-            <button class="action-btn" style="background: var(--accent); color: #fff; border: none;" onclick="downloadHandler('png')" id="btn-download-png" disabled>
-                Download Ultra HD (PNG)
-            </button>
-            <button class="action-btn" onclick="downloadHandler('svg')" id="btn-download-svg" disabled>
-                Export Vector (SVG)
-            </button>
+        </div>
+    </div>
+
+    <!-- RIGHT: ENGINE -->
+    <div class="apple-card controls-panel">
+        <div class="nav-tabs">
+            <button id="t-content" class="active" onclick="setTab('content')">Content</button>
+            <button id="t-style" onclick="setTab('style')">Style</button>
+            <button id="t-brand" onclick="setTab('brand')">Branding</button>
+        </div>
+
+        <div class="tab-scroll">
             
-            <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
-                <input type="checkbox" id="check-frame" onchange="toggleFrame()" style="width: auto;">
-                <label for="check-frame" style="font-size: 12px; color: var(--text-dim); cursor: pointer;">Add "Scan Me" Footer</label>
-            </div>
-        </div>
-
-        <div style="width: 100%; border-top: 1px solid var(--border); padding-top: 20px;">
-            <p class="section-label">History</p>
-            <div class="history-list" id="history-container">
-                <!-- History items inject here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- RIGHT PANEL -->
-    <div class="panel-dashboard">
-        <div class="tabs-header">
-            <button class="tab-trigger active" onclick="switchTab(event, 'content')">Template</button>
-            <button class="tab-trigger" onclick="switchTab(event, 'design')">Design</button>
-            <button class="tab-trigger" onclick="switchTab(event, 'branding')">Branding</button>
-        </div>
-
-        <!-- CONTENT TAB -->
-        <div id="content" class="tab-content active">
-            <p class="section-label">Payload Type</p>
-            <div class="type-grid">
-                <div class="type-btn active" onclick="switchType('url')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                    <span>URL</span>
-                </div>
-                <div class="type-btn" onclick="switchType('vcard')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-                    <span>vCard</span>
-                </div>
-                <div class="type-btn" onclick="switchType('wifi')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                    <span>WiFi</span>
-                </div>
-                <div class="type-btn" onclick="switchType('text')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    <span>Text</span>
-                </div>
-            </div>
-
-            <div id="fields-container">
-                <!-- Inputs inject here -->
-            </div>
-
-            <div style="margin-top: 30px;">
-                <p class="section-label">Quick Actions</p>
-                <div style="display: flex; gap: 8px;">
-                    <button class="action-btn" style="flex:1" onclick="useTemplate('github')">GitHub</button>
-                    <button class="action-btn" style="flex:1" onclick="useTemplate('linkedin')">LinkedIn</button>
-                    <button class="action-btn" style="flex:1" onclick="useTemplate('whatsapp')">WhatsApp</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- DESIGN TAB -->
-        <div id="design" class="tab-content">
-            <p class="section-label">Dot Patterns</p>
-            <div class="preset-grid">
-                <div class="style-tile active" onclick="selectStyle(this, 'square')"><div class="preview-icon">■</div><span>Square</span></div>
-                <div class="style-tile" onclick="selectStyle(this, 'rounded')"><div class="preview-icon">●</div><span>Rounded</span></div>
-                <div class="style-tile" onclick="selectStyle(this, 'dots')"><div class="preview-icon">...</div><span>Dots</span></div>
-                <div class="style-tile" onclick="selectStyle(this, 'extra-rounded')"><div class="preview-icon">(( ))</div><span>Liquid</span></div>
-                <div class="style-tile" onclick="selectStyle(this, 'classy')"><div class="preview-icon">◆</div><span>Classy</span></div>
-                <div class="style-tile" onclick="selectStyle(this, 'classy-rounded')"><div class="preview-icon">❃</div><span>Artistic</span></div>
-            </div>
-
-            <div style="margin-top: 24px;">
-                <p class="section-label">Color System</p>
-                <div class="color-pickers">
-                    <div class="color-item">
-                        <label>Foreground</label>
-                        <input type="color" id="color-dots" value="#000000" onchange="updateDesign()">
+            <!-- CONTENT TAB -->
+            <div id="pane-content" class="tab-pane">
+                <div class="section">
+                    <span class="section-label">Payload Type</span>
+                    <div class="style-grid">
+                        <div class="style-item active" id="type-url" onclick="setPayloadType('url')">
+                            <span class="icon">🔗</span>
+                            <span>URL</span>
+                        </div>
+                        <div class="style-item" id="type-wifi" onclick="setPayloadType('wifi')">
+                            <span class="icon">📶</span>
+                            <span>WiFi</span>
+                        </div>
+                        <div class="style-item" id="type-vcard" onclick="setPayloadType('vcard')">
+                            <span class="icon">📇</span>
+                            <span>vCard</span>
+                        </div>
                     </div>
-                    <div class="color-item">
-                        <label>Background</label>
-                        <input type="color" id="color-bg" value="#ffffff" onchange="updateDesign()">
+                </div>
+
+                <div class="section">
+                    <span class="section-label">Configuration</span>
+                    <div id="dynamic-inputs" class="input-stack">
+                        <!-- Inputs Injected Dynamically -->
                     </div>
                 </div>
             </div>
 
-            <div style="margin-top: 24px;">
-                <p class="section-label">Gradient Flow</p>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="checkbox" id="check-gradient" onchange="updateDesign()" style="width: auto;">
-                    <label for="check-gradient" style="font-size: 13px;">Enable Linear Gradient</label>
+            <!-- STYLE TAB -->
+            <div id="pane-style" class="tab-pane hidden">
+                <div class="section">
+                    <span class="section-label">Dot Pattern</span>
+                    <div class="style-grid">
+                        <div class="style-item active" id="dot-square" onclick="setDotType('square')">
+                            <span class="icon">■</span><span>Square</span>
+                        </div>
+                        <div class="style-item" id="dot-rounded" onclick="setDotType('extra-rounded')">
+                            <span class="icon">●</span><span>Rounded</span>
+                        </div>
+                        <div class="style-item" id="dot-dots" onclick="setDotType('dots')">
+                            <span class="icon">::</span><span>Dots</span>
+                        </div>
+                        <div class="style-item" id="dot-classy" onclick="setDotType('classy')">
+                            <span class="icon">◆</span><span>Classy</span>
+                        </div>
+                        <div class="style-item" id="dot-classy-rounded" onclick="setDotType('classy-rounded')">
+                            <span class="icon">❃</span><span>Artistic</span>
+                        </div>
+                        <div class="style-item" id="dot-liquid" onclick="setDotType('rounded')">
+                            <span class="icon">〰</span><span>Liquid</span>
+                        </div>
+                    </div>
                 </div>
-                <input type="color" id="color-grad" value="#8b5cf6" onchange="updateDesign()" style="margin-top: 8px;">
+
+                <div class="section">
+                    <span class="section-label">Color Palette</span>
+                    <div class="input-stack">
+                        <div class="color-row">
+                            <div class="color-item">
+                                <input type="color" id="c-dots" value="#000000" onchange="renderLive()">
+                                <span>Dots</span>
+                            </div>
+                            <div class="color-item">
+                                <input type="color" id="c-bg" value="#ffffff" onchange="renderLive()">
+                                <span>Back</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+            <!-- BRAND TAB -->
+            <div id="pane-brand" class="tab-pane hidden">
+                <div class="section">
+                    <span class="section-label">Logo Overlay</span>
+                    <button class="secondary-button" style="width: 100%;" onclick="document.getElementById('file-logo').click()">
+                        Choose Brand Icon
+                    </button>
+                    <input type="file" id="file-logo" hidden accept="image/*" onchange="loadLogo(event)">
+                    <p id="logo-meta" style="font-size: 11px; color: var(--text-secondary); margin-top: 10px; text-align: center;">Recommended: Square PNG/SVG</p>
+                </div>
+
+                <div class="section">
+                    <span class="section-label">Logo Dynamics</span>
+                    <div class="input-group">
+                        <label>Size Multiplier</label>
+                        <input type="range" id="logo-scale" min="0.1" max="0.45" step="0.05" value="0.3" oninput="renderLive()">
+                    </div>
+                </div>
+
+                <button class="secondary-button" style="width: 100%; color: #ff3b30;" onclick="clearLogo()">Remove Logo</button>
+            </div>
+
         </div>
 
-        <!-- BRANDING TAB -->
-        <div id="branding" class="tab-content">
-            <p class="section-label">Logo Overlay</p>
-            <div class="logo-upload-box" onclick="document.getElementById('logo-file').click()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                <p style="font-size: 12px; font-weight: 500;">Click to upload icon</p>
-                <p id="logo-status" style="font-size: 10px; color: var(--text-dim); margin-top: 4px;">Supports PNG, JPG, SVG</p>
-                <input type="file" id="logo-file" hidden accept="image/*" onchange="handleLogo(event)">
-            </div>
-
-            <div style="margin-top: 24px;">
-                <button class="action-btn" style="width: 100%;" onclick="clearLogo()">Remove Current Logo</button>
-            </div>
-
-            <div style="margin-top: 30px;">
-                <p class="section-label">Logo Configuration</p>
-                <div class="input-group">
-                    <label>Logo Softness (0.1 - 0.5)</label>
-                    <input type="range" id="logo-size" min="0.1" max="0.5" step="0.05" value="0.3" oninput="updateDesign()">
-                </div>
-            </div>
-        </div>
-
-        <div style="padding: 16px; border-top: 1px solid var(--border); margin-top: auto;">
-            <button class="action-btn" style="width: 100%; background: var(--accent); color: #fff; border: none; font-weight: 700;" onclick="handleGenerate()">GENERATE QR CODE</button>
+        <div class="bottom-bar">
+            <button class="primary-button" style="width: 100%;" onclick="generate()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                Generate Final
+            </button>
         </div>
     </div>
+
 </div>
 
-<div id="toast"></div>
-
-<!-- JS DOMAIN -->
 <script>
-    // ─── Constants & State ───────────────────────────────────────────
-    let qrStyled = null;
-    let selectedType = 'url';
-    let selectedStyle = 'square';
-    let logoData = null;
-    let history = JSON.parse(localStorage.getItem('qr_history') || '[]');
+    // ─── Precision Engine State ─────────────────────────────────────
+    let qr = null;
+    let logoBase64 = null;
+    let activeType = 'url';
+    let activeDotType = 'square';
+    let debounce = null;
 
-    const fieldsConfig = {
-        url:  [{ id: 'f-url', label: 'Website URL', type: 'text', placeholder: 'https://example.com' }],
-        text: [{ id: 'f-text', label: 'Plain Text Message', type: 'textarea', placeholder: 'Enter your message...' }],
+    const inputModels = {
+        url: [{ id: 'url', label: 'Website Address', placeholder: 'apple.com' }],
         wifi: [
-            { id: 'f-ssid', label: 'SSID / Network Name', type: 'text', placeholder: 'Home WiFi' },
-            { id: 'f-pass', label: 'Password', type: 'text', placeholder: '••••••••' },
-            { id: 'f-enc',  label: 'Encryption', type: 'select', options: ['WPA/WPA2', 'WEP', 'None'] }
+            { id: 'ssid', label: 'Network Name', placeholder: 'WiFi SSID' },
+            { id: 'pass', label: 'Password', placeholder: 'WPA2 Password' }
         ],
         vcard: [
-            { id: 'f-name',  label: 'Full Name', type: 'text', placeholder: 'John Doe' },
-            { id: 'f-phone', label: 'Phone', type: 'text', placeholder: '+1 234 567 890' },
-            { id: 'f-email', label: 'Email', type: 'text', placeholder: 'john@example.com' },
-            { id: 'f-org',   label: 'Organization', type: 'text', placeholder: 'Acme Corp' }
+            { id: 'vn', label: 'Name', placeholder: 'John Apple' },
+            { id: 'vp', label: 'Phone', placeholder: '+1 555 1234' }
         ]
     };
 
-    // ─── Initialization ──────────────────────────────────────────────
+    // ─── Lifecycle ──────────────────────────────────────────────────
     window.onload = () => {
-        switchType('url');
-        renderHistory();
-        checkUrlParams();
+        setPayloadType('url');
+        // Initial silent generate if any data exists
+        setTimeout(generate, 500);
     };
 
-    function switchTab(e, tabId) {
-        document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        document.getElementById(tabId).classList.add('active');
+    // ─── UI Controllers ─────────────────────────────────────────────
+    function setTab(tab) {
+        document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+        document.getElementById(`t-${tab}`).classList.add('active');
+        document.getElementById(`pane-${tab}`).classList.remove('hidden');
     }
 
-    function switchType(type) {
-        selectedType = type;
-        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
-        event?.currentTarget?.classList.add('active');
+    function setPayloadType(type) {
+        activeType = type;
+        document.querySelectorAll('#pane-content .style-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(`type-${type}`).classList.add('active');
         
-        const container = document.getElementById('fields-container');
-        container.innerHTML = fieldsConfig[type].map(f => `
+        const container = document.getElementById('dynamic-inputs');
+        container.innerHTML = inputModels[type].map(m => `
             <div class="input-group">
-                <label>${f.label}</label>
-                ${f.type === 'select' ? 
-                    `<select id="${f.id}">${f.options.map(o => `<option>${o}</option>`)}</select>` :
-                    f.type === 'textarea' ?
-                    `<textarea id="${f.id}" placeholder="${f.placeholder}" rows="4"></textarea>` :
-                    `<input type="text" id="${f.id}" placeholder="${f.placeholder}">`
-                }
+                <label>${m.label}</label>
+                <input type="text" id="in-${m.id}" placeholder="${m.placeholder}" oninput="renderLive()">
             </div>
         `).join('');
     }
 
-    function selectStyle(el, style) {
-        selectedStyle = style;
-        document.querySelectorAll('.style-tile').forEach(t => t.classList.remove('active'));
-        el.classList.add('active');
-        updateDesign();
+    function setDotType(type) {
+        activeDotType = type;
+        document.querySelectorAll('#pane-style .style-item').forEach(i => i.classList.remove('active'));
+        document.getElementById(`dot-${type.replace('-rounded', '-rounded')}`).classList.add('active'); // CSS fix
+        renderLive();
     }
 
-    // ─── Logic ───────────────────────────────────────────────────────
-    function getPayload() {
-        if(selectedType === 'url') return document.getElementById('f-url').value;
-        if(selectedType === 'text') return document.getElementById('f-text').value;
-        if(selectedType === 'wifi') {
-            const s = document.getElementById('f-ssid').value;
-            const p = document.getElementById('f-pass').value;
-            const t = document.getElementById('f-enc').value === 'None' ? 'nopass' : document.getElementById('f-enc').value;
-            return `WIFI:S:${s};T:${t};P:${p};;`;
-        }
-        if(selectedType === 'vcard') {
-            const n = document.getElementById('f-name').value;
-            const ph = document.getElementById('f-phone').value;
-            const em = document.getElementById('f-email').value;
-            const org = document.getElementById('f-org').value;
-            return `BEGIN:VCARD\nVERSION:3.0\nN:${n}\nORG:${org}\nTEL:${ph}\nEMAIL:${em}\nEND:VCARD`;
-        }
+    // ─── Rendering Engine ───────────────────────────────────────────
+    function renderLive() {
+        clearTimeout(debounce);
+        debounce = setTimeout(generate, 300);
     }
 
-    function handleGenerate() {
-        const data = getPayload();
-        if(!data || data.trim().length === 0) {
-            showToast("Enter some content first!");
-            return;
-        }
-
-        const options = buildOptions(data);
-        const container = document.getElementById('canvas-buffer');
-        container.innerHTML = '';
-        
-        qrStyled = new QRCodeStyling(options);
-        qrStyled.append(container);
-
-        document.getElementById('qr-frame').classList.add('active');
-        document.getElementById('btn-copy').disabled = false;
-        document.getElementById('btn-download-png').disabled = false;
-        document.getElementById('btn-download-svg').disabled = false;
-
-        saveToHistory(data);
-    }
-
-    function buildOptions(data) {
-        const dotColor = document.getElementById('color-dots').value;
-        const bgColor = document.getElementById('color-bg').value;
-        const useGrad = document.getElementById('check-gradient').checked;
-        const gradColor = document.getElementById('color-grad').value;
-        const logoSize = parseFloat(document.getElementById('logo-size').value);
+    function generate() {
+        const data = getFinalData();
+        if(!data) return;
 
         const options = {
-            width: 280,
-            height: 280,
+            width: 260,
+            height: 260,
             data: data,
             margin: 10,
-            qrOptions: { typeNumber: 0, mode: 'Byte', errorCorrectionLevel: 'Q' },
-            imageOptions: { hideBackgroundDots: true, imageSize: logoSize, margin: 10 },
-            dotsOptions: {
-                type: selectedStyle,
-                color: dotColor,
-                gradient: useGrad ? {
-                    type: 'linear',
-                    rotation: 0,
-                    colorStops: [{ offset: 0, color: dotColor }, { offset: 1, color: gradColor }]
-                } : null
-            },
-            backgroundOptions: { color: bgColor },
-            image: logoData
+            qrOptions: { errorCorrectionLevel: 'Q' },
+            imageOptions: { hideBackgroundDots: true, imageSize: parseFloat(document.getElementById('logo-scale').value), margin: 5 },
+            dotsOptions: { type: activeDotType, color: document.getElementById('c-dots').value },
+            backgroundOptions: { color: document.getElementById('c-bg').value },
+            image: logoBase64
         };
-        return options;
+
+        const container = document.getElementById('qr-container');
+        container.innerHTML = '';
+        qr = new QRCodeStyling(options);
+        qr.append(container);
+
+        // UI state toggle
+        document.getElementById('btn-copy').disabled = false;
+        document.getElementById('btn-png').disabled = false;
+        document.getElementById('btn-svg').disabled = false;
+        document.getElementById('placeholder-text').classList.add('hidden');
     }
 
-    function updateDesign() {
-        if(!qrStyled) return;
-        const data = getPayload();
-        qrStyled.update(buildOptions(data));
+    function getFinalData() {
+        if(activeType === 'url') return document.getElementById('in-url').value || 'https://apple.com';
+        if(activeType === 'wifi') {
+            const s = document.getElementById('in-ssid').value || 'Network';
+            const p = document.getElementById('in-pass').value || 'Pass';
+            return `WIFI:S:${s};T:WPA;P:${p};;`;
+        }
+        if(activeType === 'vcard') {
+            const n = document.getElementById('in-vn').value || 'Name';
+            const p = document.getElementById('in-vp').value || '000';
+            return `BEGIN:VCARD\nVERSION:3.0\nN:${n}\nTEL:${p}\nEND:VCARD`;
+        }
     }
 
-    // ─── Branding ────────────────────────────────────────────────────
-    function handleLogo(e) {
+    // ─── Branding Logic ──────────────────────────────────────────────
+    function loadLogo(e) {
         const file = e.target.files[0];
         if(!file) return;
         const reader = new FileReader();
-        reader.onload = (e) => {
-            logoData = e.target.result;
-            document.getElementById('logo-status').innerText = "Logo Loaded: " + file.name;
-            updateDesign();
+        reader.onload = (ev) => {
+            logoBase64 = ev.target.result;
+            document.getElementById('logo-meta').innerText = "Logo: " + file.name;
+            generate();
         };
         reader.readAsDataURL(file);
     }
 
     function clearLogo() {
-        logoData = null;
-        document.getElementById('logo-status').innerText = "Supports PNG, JPG, SVG";
-        updateDesign();
+        logoBase64 = null;
+        document.getElementById('logo-meta').innerText = "Recommended: Square PNG/SVG";
+        generate();
     }
 
-    // ─── Actions ─────────────────────────────────────────────────────
-    function toggleFrame() {
-        const frame = document.getElementById('qr-frame');
-        frame.classList.toggle('framed');
-    }
-
-    async function copyToClipboard() {
+    // ─── Productivity Actions ────────────────────────────────────────
+    async function copyPng() {
         try {
-            const blob = await qrStyled.getRawData('png');
+            const blob = await qr.getRawData('png');
             await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-            showToast('Copied to system clipboard!');
-        } catch(e) { showToast('Error copying. Try Download.'); }
+            notify("Copied to clipboard");
+        } catch { notify("Clipboard Error"); }
     }
 
-    function downloadHandler(ext) {
-        qrStyled.download({ name: 'qr_studio_export', extension: ext });
+    function download(ext) {
+        qr.download({ name: 'qr_designer', extension: ext });
+        notify("Saved as " + ext.toUpperCase());
     }
 
-    function shareWorkspace() {
-        const params = new URLSearchParams();
-        params.set('type', selectedType);
-        params.set('style', selectedStyle);
-        // Pack first field as data
-        const firstField = fieldsConfig[selectedType][0].id;
-        params.set('data', document.getElementById(firstField).value);
-        
-        const url = window.location.origin + window.location.pathname + '?' + params.toString();
-        navigator.clipboard.writeText(url);
-        showToast('Configuration link copied!');
-    }
-
-    function useTemplate(tpl) {
-        switchType('url');
-        const input = document.getElementById('f-url');
-        if(tpl === 'github') input.value = 'https://github.com/';
-        if(tpl === 'linkedin') input.value = 'https://linkedin.com/in/';
-        if(tpl === 'whatsapp') input.value = 'https://wa.me/';
-        input.focus();
-    }
-
-    // ─── History ─────────────────────────────────────────────────────
-    function saveToHistory(data) {
-        if(history.includes(data)) return;
-        history.unshift(data);
-        if(history.length > 5) history.pop();
-        localStorage.setItem('qr_history', JSON.stringify(history));
-        renderHistory();
-    }
-
-    async function renderHistory() {
-        const container = document.getElementById('history-container');
-        container.innerHTML = history.map((item, idx) => `
-            <div class="history-item" onclick="loadHistory('${item}')" title="${item}">
-                <div id="hist-qr-${idx}" style="width:100%; height:100%"></div>
-            </div>
-        `).join('');
-
-        // Generate tiny previews
-        history.forEach((item, idx) => {
-            new QRCodeStyling({
-                width: 50, height: 50, data: item, margin: 2,
-                dotsOptions: { type: 'square', color: '#000' }
-            }).append(document.getElementById(`hist-qr-${idx}`));
-        });
-    }
-
-    function loadHistory(item) {
-        switchType('url'); // Default to URL for simplicity in loading history
-        document.getElementById('f-url').value = item;
-        handleGenerate();
-    }
-
-    // ─── Utils ───────────────────────────────────────────────────────
-    function showToast(msg) {
+    function notify(msg) {
         const t = document.getElementById('toast');
         t.innerText = msg;
-        t.classList.add('visible');
-        setTimeout(() => t.classList.remove('visible'), 3000);
-    }
-
-    function checkUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        if(urlParams.has('data')) {
-            const type = urlParams.get('type') || 'url';
-            switchType(type);
-            const firstField = fieldsConfig[type][0].id;
-            document.getElementById(firstField).value = urlParams.get('data');
-            // Wait for DOM to catch up or just handle it
-            setTimeout(() => handleGenerate(), 100);
-        }
+        t.classList.add('active');
+        setTimeout(() => t.classList.remove('active'), 2500);
     }
 </script>
 </body>
