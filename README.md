@@ -1,35 +1,52 @@
-# ⬛ QR Code Generator Pro
+# ⬛ QR Studio Pro
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Built%20With-HTML%20%7C%20CSS%20%7C%20JavaScript-black?style=for-the-badge&logo=html5&logoColor=white" />
-  <img src="https://img.shields.io/badge/Design-Glassmorphism-blueviolet?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/API-QuickChart.io-orange?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Built%20With-HTML%20%7C%20CSS%20%7C%20JavaScript-black?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Design-Glassmorphism%20Split%20Panel-blueviolet?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Library-QR%20Code%20Styling-orange?style=for-the-badge" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 </p>
 
 <p align="center">
-  A premium, Silicon Valley-grade QR Code Generator built with pure HTML, CSS, and JavaScript.  
-  No frameworks. No bloat. Just clean, performant code with an Apple-level aesthetic.
+  A premium, Silicon Valley-grade QR Code design studio built with pure HTML, CSS, and JavaScript.<br>
+  No frameworks. No backend. No API calls. Just beautiful, styled QR codes — generated entirely in your browser.
 </p>
 
 ---
 
 ## ✨ Features
 
-- 🎨 **Glassmorphism UI** — Dark-mode frosted glass card with backdrop-blur and ambient glow
-- ⚡ **Instant Generation** — QR codes rendered in real-time via the QuickChart API
-- 🔮 **Ultra HD Output** — Always generates at 600×600px for maximum scan reliability
-- 🧠 **Smart Validation** — Empty input triggers a smooth shake animation, no ugly alerts
-- 🌊 **Micro-Animations** — Slide-up entrance, QR fade-in, button shimmer sweep on hover
-- ⌨️ **Keyboard Shortcut** — `Ctrl+Enter` / `Cmd+Enter` to generate without lifting your hands
-- 📱 **Responsive** — Works perfectly on all screen sizes
-- 🚀 **Zero Dependencies** — Single HTML file, no npm, no build step, no framework
+### 🎨 6 Style Presets
+| Style | Description |
+|---|---|
+| **Classic** | High-contrast square modules for maximum scanner compatibility |
+| **Rounded** | Soft extra-rounded dots and corner frames — modern and elegant |
+| **Dots** | Every module rendered as a perfect circle — very artistic |
+| **Gradient** | Purple-to-blue linear gradient swept across all dots — truly stunning |
+| **Classy** | Circular corner markers with stylized inner dot patterns |
+| **Dark** | Inverted — crisp white modules on a deep black background |
+
+### 🌈 6 Color Themes
+Apply any solid color to Classic, Rounded, Dots, Classy, or Dark presets:
+`Obsidian` · `Violet` · `Electric` · `Rose` · `Emerald` · `Amber`
+
+### ⚡ Power Features
+- **Live Preview** — QR code auto-generates 600ms after you stop typing
+- **Scan-line animation** — a purple laser sweep plays while rendering
+- **Copy to Clipboard** — copies the QR code as a PNG directly to your clipboard
+- **Download PNG** — saves a high-quality export to your computer
+- **Toast Notifications** — smooth feedback messages after copy/download
+- **`Ctrl+Enter` / `Cmd+Enter`** — keyboard shortcut to generate instantly
+- **Shake validation** — empty input triggers a smooth shake animation, no alerts
+- **Error Correction Level H** — 30% damage recovery so artistic styles still scan reliably
+- **Zero dependencies** — single HTML file, no npm, no build step, no framework
 
 ---
 
 ## 🖥️ Preview
 
-> Dark glassmorphic interface with a large QR display, a monospace payload input, and an animated glass button
+> A professional split-panel UI: QR preview on the left, style + color controls on the right.  
+> Powered by the [QR Code Styling](https://github.com/kozakdenys/qr-code-styling) library for client-side rendering.
 
 ---
 
@@ -38,33 +55,31 @@
 | Layer | Technology |
 |---|---|
 | Structure | HTML5 Semantic Markup |
-| Styling | Vanilla CSS (Glassmorphism, Animations, Custom Properties) |
-| Logic | Vanilla JavaScript (ES6+) |
+| Styling | Vanilla CSS (Glassmorphism, CSS Grid, Custom Properties, Animations) |
+| Logic | Vanilla JavaScript (ES6+, Async/Await, ClipboardAPI) |
+| QR Engine | [QR Code Styling v1.6](https://github.com/kozakdenys/qr-code-styling) (client-side canvas rendering) |
 | Typography | [Inter](https://fonts.google.com/specimen/Inter) + [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) |
-| QR API | [QuickChart.io](https://quickchart.io/documentation/qr-codes/) |
 
 ---
 
 ## 🚀 Getting Started
 
-### Option 1 — Just Open It (Easiest)
+### Option 1 — Just Open It (Simplest)
 ```bash
-# Clone the repo
 git clone https://github.com/SanketDhengre/JAVASCRIPT-QR_CODE_GENERATOR.git
-
-# Open directly in your browser
 cd JAVASCRIPT-QR_CODE_GENERATOR
-start index.html  # Windows
-open index.html   # macOS
+
+# Windows
+start index.html
+
+# macOS / Linux
+open index.html
 ```
 
-### Option 2 — Local Dev Server
+### Option 2 — Local Dev Server (Python)
 ```bash
-# Using Python (built-in)
 python -m http.server 8000
-
-# Then open
-http://localhost:8000
+# Then open → http://localhost:8000
 ```
 
 ### Option 3 — VS Code Live Server
@@ -73,11 +88,13 @@ http://localhost:8000
 
 ---
 
-## 📖 Usage
+## 📖 How to Use
 
-1. **Enter your payload** — Paste any URL, text, contact info, or Wi-Fi credentials into the input field
-2. **Click Generate Code** — Or press `Ctrl+Enter` / `Cmd+Enter`
-3. **Scan or Save** — Right-click the generated QR code to save as a 600×600 Ultra HD PNG
+1. **Enter your payload** — Type any URL, plain text, Wi-Fi credentials, or contact info into the input field. The QR code starts generating automatically after you pause typing.
+2. **Pick a style** — Choose from 6 visual presets: Classic, Rounded, Dots, Gradient, Classy, or Dark.
+3. **Pick a color** — Select one of 6 color themes (applies to non-gradient styles).
+4. **Generate** — Click **Generate Code** or press `Ctrl+Enter`.
+5. **Export** — Hit **Copy** to send the PNG to your clipboard, or **Download** to save the file locally.
 
 ---
 
@@ -85,12 +102,13 @@ http://localhost:8000
 
 > *"Design is not just what it looks like and feels like. Design is how it works."* — Steve Jobs
 
-This project was built with a single principle: **every pixel should have a purpose.**
+Every decision in this project was intentional:
 
-- **No dropdowns** for settings the user shouldn't need to think about
-- **No alert boxes** — validation is communicated through motion
-- **No white backgrounds** — the dark palette is intentional and reduces visual fatigue
-- **No scrollbars** — the entire interface fits within a single viewport
+- **Split-panel layout** — Controls and output live side-by-side, like a real design tool
+- **No API calls** — QR codes render entirely on-device using canvas, making it instant and offline-capable
+- **No alerts or popups** — Validation is communicated through motion (shake animation)
+- **No configuration overload** — The most complex output parameter (resolution) is set to Ultra HD automatically
+- **Living preview** — The code updates live as you type, making it feel immediate and responsive
 
 ---
 
@@ -99,6 +117,8 @@ This project was built with a single principle: **every pixel should have a purp
 **Sanket Dhengre**
 
 > Engineered with precision. Designed with intent.
+
+- 🐙 GitHub: [@SanketDhengre](https://github.com/SanketDhengre)
 
 ---
 
