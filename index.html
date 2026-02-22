@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Studio — Code Generator Pro</title>
-    <meta name="description" content="Generate beautiful, styled QR codes instantly. Multiple styles, color themes, and download support.">
+    <title>QR Studio Pro — The Ultimate QR Design Tool</title>
+    <meta name="description" content="Professional QR Code Studio. Style, brand, and generate high-fidelity QR codes with logos, gradients, and templates.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -13,732 +13,740 @@
     <style>
         /* ─── Design Tokens ─────────────────────────────────────────── */
         :root {
-            --bg:            #060608;
-            --surface:       rgba(18, 18, 22, 0.75);
-            --surface-hover: rgba(30, 30, 38, 0.8);
+            --bg:            #040406;
+            --surface:       rgba(18, 18, 24, 0.7);
+            --surface-elev:  rgba(30, 30, 42, 0.85);
             --border:        rgba(255,255,255,0.06);
-            --border-strong: rgba(255,255,255,0.12);
-            --text:          #f1f1f3;
-            --text-muted:    #6b6b7a;
+            --border-active: rgba(139,92,246,0.5);
+            --text:          #f8fafc;
+            --text-dim:      #94a3b8;
             --accent:        #8b5cf6;
-            --accent-dim:    rgba(139,92,246,0.18);
             --accent-glow:   rgba(139,92,246,0.3);
+            --success:       #10b981;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-font-smoothing: antialiased; }
         
-        html, body { height: 100%; }
-
         body {
             background: var(--bg);
             color: var(--text);
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 40px 16px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
-        /* ─── Multi-color ambient background ───────────────────────── */
-        .ambient {
+        /* ─── Background Effects ─────────────────────────────────────── */
+        .ambient-glow {
             position: fixed;
             inset: 0;
-            pointer-events: none;
             z-index: 0;
-            overflow: hidden;
-        }
-        .ambient span {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(90px);
-            animation: drift 20s ease-in-out infinite alternate;
-        }
-        .ambient span:nth-child(1) {
-            width: 500px; height: 500px;
-            background: rgba(139,92,246,0.10);
-            top: -100px; left: -100px;
-        }
-        .ambient span:nth-child(2) {
-            width: 400px; height: 400px;
-            background: rgba(59,130,246,0.08);
-            bottom: -80px; right: -80px;
-            animation-delay: -7s;
-        }
-        .ambient span:nth-child(3) {
-            width: 300px; height: 300px;
-            background: rgba(236,72,153,0.06);
-            top: 40%; left: 40%;
-            animation-delay: -14s;
-        }
-        @keyframes drift {
-            0%   { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(40px, 30px) scale(1.15); }
+            pointer-events: none;
+            background: 
+                radial-gradient(circle at 10% 10%, rgba(139,92,246,0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(59,130,246,0.08) 0%, transparent 40%);
         }
 
-        /* ─── Top Nav Bar ────────────────────────────────────────────── */
-        .nav {
-            position: relative; z-index: 2;
-            width: 100%; max-width: 760px;
-            display: flex; align-items: center; justify-content: space-between;
-            margin-bottom: 20px;
-        }
-        .nav-brand {
-            display: flex; align-items: center; gap: 8px;
-        }
-        .nav-brand .icon-wrap {
-            width: 28px; height: 28px;
-            background: var(--accent-dim);
-            border: 1px solid rgba(139,92,246,0.3);
-            border-radius: 8px;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .nav-brand .icon-wrap svg { width: 14px; height: 14px; color: #a78bfa; }
-        .nav-brand span {
-            font-size: 14px; font-weight: 600; letter-spacing: -0.02em;
-        }
-        .nav-brand small {
-            font-size: 11px; color: var(--text-muted); font-weight: 400;
-        }
-        .nav-badge {
-            font-size: 10px; font-weight: 600; color: #a78bfa; letter-spacing: 0.08em;
-            background: var(--accent-dim); border: 1px solid rgba(139,92,246,0.25);
-            border-radius: 999px; padding: 3px 10px; text-transform: uppercase;
+        /* ─── Layout ─────────────────────────────────────────────────── */
+        .studio-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 24px;
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-        /* ─── Main Card  ─────────────────────────────────────────────── */
-        .card {
-            position: relative; z-index: 1;
-            width: 100%; max-width: 760px;
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Left Panel: Display ────────────────────────────────────── */
+        .panel-preview {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            backdrop-filter: blur(40px);
-            -webkit-backdrop-filter: blur(40px);
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.025) inset,
-                0 40px 100px -20px rgba(0,0,0,0.9),
-                0 0 100px -30px rgba(139,92,246,0.1);
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            animation: cardIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(28px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0)    scale(1); }
-        }
-
-        /* ─── Left: Preview Panel ────────────────────────────────────── */
-        .panel-preview {
-            border-right: 1px solid var(--border);
-            padding: 28px;
+            border-radius: 28px;
+            padding: 32px;
+            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
+            gap: 24px;
             align-items: center;
-            justify-content: center;
-            gap: 20px;
+            justify-content: flex-start;
         }
 
-        .qr-frame {
-            width: 220px; height: 220px;
-            border-radius: 18px;
+        .qr-wrapper {
+            width: 100%;
+            aspect-ratio: 1;
             background: rgba(0,0,0,0.4);
             border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.16,1,0.3,1);
-        }
-        .qr-frame.lit {
-            background: #fff;
-            border-color: rgba(255,255,255,0.25);
-            box-shadow: 0 0 60px rgba(255,255,255,0.06), 0 0 130px rgba(139,92,246,0.07);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.5s ease;
         }
 
-        /* Scan-line animation overlaid on the QR */
-        .scan-line {
+        .qr-wrapper.active {
+            background: #ffffff;
+            border-color: rgba(255,255,255,0.2);
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5), 0 0 20px rgba(139,92,246,0.1);
+        }
+
+        .scan-me-label {
             position: absolute;
-            left: 0; right: 0;
-            height: 2px;
-            background: linear-gradient(90deg, transparent, rgba(139,92,246,0.8), transparent);
-            top: 0;
-            animation: scan 2s linear infinite;
-            display: none;
-        }
-        .qr-frame.scanning .scan-line { display: block; }
-        @keyframes scan {
-            0%   { top: 0%;   opacity: 0.8; }
-            50%  { opacity: 1; }
-            100% { top: 100%; opacity: 0; }
-        }
-
-        #qr-canvas {
+            bottom: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #000;
+            text-transform: uppercase;
             opacity: 0;
-            transform: scale(0.88);
-            transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.16,1,0.3,1);
-        }
-        #qr-canvas.show { opacity: 1; transform: scale(1); }
-
-        .placeholder {
-            position: absolute;
-            display: flex; flex-direction: column; align-items: center; gap: 12px;
-            transition: opacity 0.4s ease;
-        }
-        .placeholder svg { width: 40px; height: 40px; color: var(--text-muted); opacity: 0.25; }
-        .placeholder p {
-            font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px;
-            text-transform: uppercase; font-weight: 500;
+            transition: opacity 0.3s;
         }
 
-        /* Action buttons below QR */
-        .preview-actions { display: flex; gap: 8px; width: 100%; }
+        .qr-wrapper.framed .scan-me-label { opacity: 1; }
+
+        #canvas-buffer { transform: scale(0.9); transition: transform 0.4s; }
+        .qr-wrapper.active #canvas-buffer { transform: scale(1); }
+
+        .preview-actions {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-group-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
         .action-btn {
-            flex: 1;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-            background: rgba(255,255,255,0.035);
+            background: rgba(255,255,255,0.03);
             border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            font-size: 12px; font-weight: 500;
-            padding: 10px 8px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-        .action-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
-        .action-btn:hover {
-            background: var(--surface-hover);
-            border-color: var(--border-strong);
             color: var(--text);
+            padding: 12px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
-        .action-btn:disabled { opacity: 0.3; cursor: default; }
-        .action-btn:disabled:hover { background: rgba(255,255,255,0.035); border-color: var(--border); color: var(--text-muted); }
 
-        /* ─── Right: Controls Panel ───────────────────────────────────── */
-        .panel-controls { padding: 28px; display: flex; flex-direction: column; gap: 22px; }
-
-        .section-title {
-            font-size: 10.5px; font-weight: 600;
-            color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
-            margin-bottom: 10px;
+        .action-btn:hover:not(:disabled) {
+            background: rgba(255,255,255,0.08);
+            border-color: var(--border-active);
         }
 
-        /* Style grid: 3 cols × 2 rows */
-        .style-grid {
+        .action-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* ─── Right Panel: Dashboard ────────────────────────────────── */
+        .panel-dashboard {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 28px;
+            padding: 4px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs-header {
+            display: flex;
+            padding: 12px;
+            gap: 4px;
+        }
+
+        .tab-trigger {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        .tab-trigger.active {
+            background: var(--surface-elev);
+            color: var(--text);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            padding: 24px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+            height: 480px;
+            overflow-y: auto;
+        }
+
+        .tab-content.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Components ────────────────────────────────────────────── */
+        .section-row { margin-bottom: 24px; }
+        .section-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .input-group { margin-bottom: 16px; position: relative; }
+        .input-group label { display: block; font-size: 13px; margin-bottom: 6px; color: var(--text-dim); }
+        
+        input, select, textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus { border-color: var(--accent); }
+
+        .type-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .type-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            padding: 12px 4px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .type-btn.active {
+            background: var(--surface-elev);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .type-btn svg { width: 18px; height: 18px; margin-bottom: 6px; }
+        .type-btn span { font-size: 11px; font-weight: 600; display: block; }
+
+        .preset-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
         }
+
         .style-tile {
-            background: rgba(255,255,255,0.025);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 10px 6px 8px;
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            cursor: pointer;
-            font-size: 11px; font-weight: 500;
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            transition: all 0.22s cubic-bezier(0.16,1,0.3,1);
-            user-select: none;
-        }
-        .style-tile:hover {
-            background: var(--accent-dim);
-            border-color: rgba(139,92,246,0.3);
-            color: #c4b5fd;
-            transform: translateY(-2px);
-        }
-        .style-tile.active {
-            background: var(--accent-dim);
-            border-color: rgba(139,92,246,0.55);
-            color: #c4b5fd;
-            box-shadow: 0 0 20px rgba(139,92,246,0.15);
-        }
-        .style-tile .thumb { width: 38px; height: 38px; border-radius: 6px; overflow: hidden; }
-        .style-tile .thumb svg { width: 100%; height: 100%; }
-
-        /* Color swatches */
-        .color-row { display: flex; gap: 8px; flex-wrap: wrap; }
-        .color-swatch {
-            width: 32px; height: 32px; border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        .color-swatch::after {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            transition: border-color 0.2s ease;
-        }
-        .color-swatch.active::after { border-color: rgba(255,255,255,0.5); }
-        .color-swatch:hover { transform: scale(1.15); }
-
-        /* Input */
-        label.field-label {
-            display: block;
-            font-size: 10.5px; font-weight: 600;
-            color: var(--text-muted); letter-spacing: 0.1em; text-transform: uppercase;
-            margin-bottom: 8px;
-        }
-        .input-wrap { position: relative; }
-        .input-wrap svg.input-icon {
-            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            width: 14px; height: 14px; color: var(--text-muted); pointer-events: none;
-        }
-        input#payload {
-            width: 100%;
             background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.08);
-            color: var(--text);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
-            padding: 13px 14px 13px 38px;
-            border-radius: 12px;
-            outline: none;
-            transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
-        }
-        input#payload:focus {
-            border-color: rgba(139,92,246,0.55);
-            background: rgba(139,92,246,0.04);
-            box-shadow: 0 0 0 3px rgba(139,92,246,0.18);
-        }
-        input#payload::placeholder { color: rgba(107,107,122,0.5); }
-
-        /* Generate */
-        .btn-gen {
-            width: 100%;
-            position: relative; overflow: hidden;
-            background: linear-gradient(140deg, rgba(139,92,246,0.22), rgba(59,130,246,0.18));
-            border: 1px solid rgba(139,92,246,0.35);
-            color: #ddd6fe;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 14px; font-weight: 600;
-            font-family: 'Inter', sans-serif;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 12px;
             cursor: pointer;
-            transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
+            text-align: center;
+            transition: all 0.2s;
         }
-        .btn-gen::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: translateX(-200%);
-            transition: transform 0.7s ease;
+
+        .style-tile.active { border-color: var(--accent); background: rgba(139,92,246,0.05); }
+        .style-tile .preview-icon { height: 40px; margin-bottom: 4px; display: flex; align-items: center; justify-content: center; }
+
+        .color-pickers { display: flex; gap: 12px; }
+        .color-item { flex: 1; }
+
+        .logo-upload-box {
+            border: 2px dashed var(--border);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .btn-gen:hover {
-            transform: translateY(-2px);
-            border-color: rgba(139,92,246,0.7);
-            background: linear-gradient(140deg, rgba(139,92,246,0.35), rgba(59,130,246,0.28));
-            box-shadow: 0 8px 30px rgba(139,92,246,0.25);
-            color: #fff;
+
+        .logo-upload-box:hover { border-color: var(--accent); background: rgba(255,255,255,0.02); }
+
+        .history-list {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 8px;
         }
-        .btn-gen:hover::after { transform: translateX(200%); }
-        .btn-gen:active { transform: translateY(1px); }
-        .btn-gen.loading > .btn-label { display: none; }
-        .spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(200,180,255,0.2);
-            border-top-color: #ddd6fe;
-            border-radius: 50%;
-            animation: spin 0.75s linear infinite;
-            display: none;
+
+        .history-item {
+            flex: 0 0 60px;
+            height: 60px;
+            background: #fff;
+            border-radius: 8px;
+            padding: 4px;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        .btn-gen.loading .spinner { display: block; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .history-item:hover { transform: scale(1.1); }
+        .history-item img { width: 100%; height: 100%; object-fit: contain; }
 
         /* ─── Toast ───────────────────────────────────────────────────── */
-        .toast {
-            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-            background: rgba(30,30,38,0.95);
-            border: 1px solid var(--border-strong);
-            border-radius: 10px;
-            padding: 11px 18px;
-            font-size: 13px; color: var(--text);
-            backdrop-filter: blur(20px);
-            opacity: 0;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-            z-index: 99;
-            display: flex; align-items: center; gap: 8px;
-            pointer-events: none;
-            white-space: nowrap;
+        #toast {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: var(--surface-elev); border: 1px solid var(--border-active);
+            padding: 12px 24px; border-radius: 12px; font-size: 13px; font-weight: 500;
+            transition: all 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+            z-index: 999;
         }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        .toast svg { width: 16px; height: 16px; color: #a78bfa; }
+        #toast.visible { transform: translateX(-50%) translateY(0); }
 
-        /* ─── Footer ──────────────────────────────────────────────────── */
-        .footer {
-            position: relative; z-index: 1;
-            margin-top: 16px;
-            font-size: 11px; color: var(--text-muted);
-            text-align: center;
-        }
-        .footer span { color: var(--text); }
-
-        /* ─── Responsive ──────────────────────────────────────────────── */
-        @media (max-width: 620px) {
-            .card { grid-template-columns: 1fr; max-width: 380px; }
-            .panel-preview { border-right: none; border-bottom: 1px solid var(--border); }
-            .nav { max-width: 380px; }
-        }
+        /* ─── Scrollbar ───────────────────────────────────────────────── */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-<!-- Ambient orbs -->
-<div class="ambient"><span></span><span></span><span></span></div>
+<div class="ambient-glow"></div>
 
-<!-- Nav -->
-<nav class="nav">
-    <div class="nav-brand">
-        <div class="icon-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
-                <rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="2.5"/>
-            </svg>
-        </div>
-        <div>
-            <span>QR Studio</span><br>
-            <small>by Sanket Dhengre</small>
-        </div>
-    </div>
-    <span class="nav-badge">Pro</span>
-</nav>
-
-<!-- Main Card -->
-<div class="card">
-
-    <!-- LEFT: Preview -->
+<div class="studio-container">
+    
+    <!-- LEFT PANEL -->
     <div class="panel-preview">
-        <div class="qr-frame" id="qr-frame">
-            <div class="scan-line" id="scan-line"></div>
-            <div class="placeholder" id="placeholder">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3">
-                    <rect x="2" y="2" width="9" height="9" rx="1.5"/>
-                    <rect x="13" y="2" width="9" height="9" rx="1.5"/>
-                    <rect x="2" y="13" width="9" height="9" rx="1.5"/>
-                    <rect x="5" y="5" width="3" height="3"/>
-                    <rect x="16" y="5" width="3" height="3"/>
-                    <rect x="5" y="16" width="3" height="3"/>
-                    <path d="M13 13h2v2h-2zM17 13h4M17 17h4M13 17v4M13 21h4"/>
-                </svg>
-                <p>Awaiting Input</p>
-            </div>
-            <div id="qr-canvas"></div>
+        <div style="text-align: left; width: 100%;">
+            <p style="font-size: 14px; font-weight: 700;">QR STUDIO <span style="color: var(--accent);">PRO</span></p>
+            <p style="font-size: 11px; color: var(--text-dim);">Live Output Engine v4.0</p>
+        </div>
+
+        <div class="qr-wrapper" id="qr-frame">
+            <div id="canvas-buffer"></div>
+            <div class="scan-me-label">SCAN ME</div>
         </div>
 
         <div class="preview-actions">
-            <button class="action-btn" id="copy-btn" onclick="copyQR()" disabled title="Copy to clipboard">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                Copy
+            <div class="btn-group-row">
+                <button class="action-btn" id="btn-copy" onclick="copyToClipboard()" disabled>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    Copy
+                </button>
+                <button class="action-btn" id="btn-share" onclick="shareWorkspace()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                    Share
+                </button>
+            </div>
+            <button class="action-btn" style="background: var(--accent); color: #fff; border: none;" onclick="downloadHandler('png')" id="btn-download-png" disabled>
+                Download Ultra HD (PNG)
             </button>
-            <button class="action-btn" id="download-btn" onclick="downloadQR()" disabled title="Download PNG">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-                </svg>
-                Download
+            <button class="action-btn" onclick="downloadHandler('svg')" id="btn-download-svg" disabled>
+                Export Vector (SVG)
             </button>
+            
+            <div style="margin-top: 10px; display: flex; align-items: center; gap: 8px;">
+                <input type="checkbox" id="check-frame" onchange="toggleFrame()" style="width: auto;">
+                <label for="check-frame" style="font-size: 12px; color: var(--text-dim); cursor: pointer;">Add "Scan Me" Footer</label>
+            </div>
+        </div>
+
+        <div style="width: 100%; border-top: 1px solid var(--border); padding-top: 20px;">
+            <p class="section-label">History</p>
+            <div class="history-list" id="history-container">
+                <!-- History items inject here -->
+            </div>
         </div>
     </div>
 
-    <!-- RIGHT: Controls -->
-    <div class="panel-controls">
+    <!-- RIGHT PANEL -->
+    <div class="panel-dashboard">
+        <div class="tabs-header">
+            <button class="tab-trigger active" onclick="switchTab(event, 'content')">Template</button>
+            <button class="tab-trigger" onclick="switchTab(event, 'design')">Design</button>
+            <button class="tab-trigger" onclick="switchTab(event, 'branding')">Branding</button>
+        </div>
 
-        <!-- Style Presets -->
-        <div>
-            <p class="section-title">Style</p>
-            <div class="style-grid">
-                <button class="style-tile active" data-style="classic" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="white"/>
-                        <rect x="4" y="4" width="11" height="11" fill="#111"/><rect x="23" y="4" width="11" height="11" fill="#111"/><rect x="4" y="23" width="11" height="11" fill="#111"/>
-                        <rect x="6" y="6" width="7" height="7" fill="white"/><rect x="25" y="6" width="7" height="7" fill="white"/><rect x="6" y="25" width="7" height="7" fill="white"/>
-                        <rect x="23" y="23" width="3" height="3" fill="#111"/><rect x="28" y="23" width="3" height="3" fill="#111"/>
-                        <rect x="23" y="28" width="3" height="3" fill="#111"/><rect x="28" y="28" width="3" height="3" fill="#111"/>
-                        <rect x="17" y="4" width="3" height="3" fill="#111"/><rect x="17" y="8" width="3" height="3" fill="#111"/>
-                        <rect x="17" y="23" width="3" height="3" fill="#111"/><rect x="4" y="17" width="3" height="3" fill="#111"/>
-                        </svg>
-                    </div>
-                    Classic
-                </button>
-                <button class="style-tile" data-style="rounded" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="white"/>
-                        <rect x="4" y="4" width="11" height="11" rx="3.5" fill="#111"/><rect x="23" y="4" width="11" height="11" rx="3.5" fill="#111"/><rect x="4" y="23" width="11" height="11" rx="3.5" fill="#111"/>
-                        <rect x="6" y="6" width="7" height="7" rx="2" fill="white"/><rect x="25" y="6" width="7" height="7" rx="2" fill="white"/><rect x="6" y="25" width="7" height="7" rx="2" fill="white"/>
-                        <circle cx="24.5" cy="24.5" r="1.8" fill="#111"/><circle cx="29.5" cy="24.5" r="1.8" fill="#111"/>
-                        <circle cx="24.5" cy="29.5" r="1.8" fill="#111"/><circle cx="29.5" cy="29.5" r="1.8" fill="#111"/>
-                        </svg>
-                    </div>
-                    Rounded
-                </button>
-                <button class="style-tile" data-style="dots" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="white"/>
-                        <circle cx="8" cy="8" r="2.5" fill="#111"/><circle cx="14" cy="8" r="2.5" fill="#111"/>
-                        <circle cx="20" cy="8" r="2.5" fill="#111"/><circle cx="26" cy="8" r="2.5" fill="#111"/>
-                        <circle cx="32" cy="8" r="2.5" fill="#111"/><circle cx="8" cy="14" r="2.5" fill="#111"/>
-                        <circle cx="32" cy="14" r="2.5" fill="#111"/><circle cx="8" cy="20" r="2.5" fill="#111"/>
-                        <circle cx="14" cy="20" r="2.5" fill="#111"/><circle cx="20" cy="20" r="2.5" fill="#111"/>
-                        <circle cx="32" cy="20" r="2.5" fill="#111"/><circle cx="8" cy="26" r="2.5" fill="#111"/>
-                        <circle cx="20" cy="26" r="2.5" fill="#111"/><circle cx="32" cy="26" r="2.5" fill="#111"/>
-                        <circle cx="8" cy="32" r="2.5" fill="#111"/><circle cx="14" cy="32" r="2.5" fill="#111"/>
-                        <circle cx="26" cy="32" r="2.5" fill="#111"/><circle cx="32" cy="32" r="2.5" fill="#111"/>
-                        </svg>
-                    </div>
-                    Dots
-                </button>
-                <button class="style-tile" data-style="gradient" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="white"/>
-                        <defs><linearGradient id="gA" x1="0" y1="0" x2="38" y2="38" gradientUnits="userSpaceOnUse"><stop stop-color="#8b5cf6"/><stop offset="1" stop-color="#3b82f6"/></linearGradient></defs>
-                        <rect x="4" y="4" width="11" height="11" rx="3.5" fill="url(#gA)"/><rect x="23" y="4" width="11" height="11" rx="3.5" fill="url(#gA)"/><rect x="4" y="23" width="11" height="11" rx="3.5" fill="url(#gA)"/>
-                        <rect x="6" y="6" width="7" height="7" rx="2" fill="white"/><rect x="25" y="6" width="7" height="7" rx="2" fill="white"/><rect x="6" y="25" width="7" height="7" rx="2" fill="white"/>
-                        <circle cx="24.5" cy="24.5" r="1.8" fill="url(#gA)"/><circle cx="29.5" cy="24.5" r="1.8" fill="url(#gA)"/>
-                        <circle cx="24.5" cy="29.5" r="1.8" fill="url(#gA)"/><circle cx="29.5" cy="29.5" r="1.8" fill="url(#gA)"/>
-                        </svg>
-                    </div>
-                    Gradient
-                </button>
-                <button class="style-tile" data-style="classy" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="white"/>
-                        <rect x="4" y="4" width="11" height="11" rx="5" fill="#111"/><rect x="23" y="4" width="11" height="11" rx="5" fill="#111"/><rect x="4" y="23" width="11" height="11" rx="5" fill="#111"/>
-                        <circle cx="9.5" cy="9.5" r="3.5" fill="white"/><circle cx="28.5" cy="9.5" r="3.5" fill="white"/><circle cx="9.5" cy="28.5" r="3.5" fill="white"/>
-                        <rect x="23" y="23" width="4" height="4" rx="2" fill="#111"/><rect x="29" y="23" width="4" height="4" rx="2" fill="#111"/>
-                        <rect x="23" y="29" width="4" height="4" rx="2" fill="#111"/><rect x="29" y="29" width="4" height="4" rx="2" fill="#111"/>
-                        </svg>
-                    </div>
-                    Classy
-                </button>
-                <button class="style-tile" data-style="dark" onclick="selectStyle(this)">
-                    <div class="thumb">
-                        <svg viewBox="0 0 38 38" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="38" height="38" fill="#111"/>
-                        <rect x="4" y="4" width="11" height="11" rx="3.5" fill="white"/><rect x="23" y="4" width="11" height="11" rx="3.5" fill="white"/><rect x="4" y="23" width="11" height="11" rx="3.5" fill="white"/>
-                        <rect x="6" y="6" width="7" height="7" rx="2" fill="#111"/><rect x="25" y="6" width="7" height="7" rx="2" fill="#111"/><rect x="6" y="25" width="7" height="7" rx="2" fill="#111"/>
-                        <circle cx="24.5" cy="24.5" r="1.8" fill="white"/><circle cx="29.5" cy="24.5" r="1.8" fill="white"/>
-                        <circle cx="24.5" cy="29.5" r="1.8" fill="white"/><circle cx="29.5" cy="29.5" r="1.8" fill="white"/>
-                        </svg>
-                    </div>
-                    Dark
-                </button>
+        <!-- CONTENT TAB -->
+        <div id="content" class="tab-content active">
+            <p class="section-label">Payload Type</p>
+            <div class="type-grid">
+                <div class="type-btn active" onclick="switchType('url')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    <span>URL</span>
+                </div>
+                <div class="type-btn" onclick="switchType('vcard')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    <span>vCard</span>
+                </div>
+                <div class="type-btn" onclick="switchType('wifi')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 13a10 10 0 0 1 14 0"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 20 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+                    <span>WiFi</span>
+                </div>
+                <div class="type-btn" onclick="switchType('text')">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <span>Text</span>
+                </div>
+            </div>
+
+            <div id="fields-container">
+                <!-- Inputs inject here -->
+            </div>
+
+            <div style="margin-top: 30px;">
+                <p class="section-label">Quick Actions</p>
+                <div style="display: flex; gap: 8px;">
+                    <button class="action-btn" style="flex:1" onclick="useTemplate('github')">GitHub</button>
+                    <button class="action-btn" style="flex:1" onclick="useTemplate('linkedin')">LinkedIn</button>
+                    <button class="action-btn" style="flex:1" onclick="useTemplate('whatsapp')">WhatsApp</button>
+                </div>
             </div>
         </div>
 
-        <!-- Color -->
-        <div>
-            <p class="section-title">Color</p>
-            <div class="color-row" id="color-row">
-                <div class="color-swatch active" data-color="#111111" style="background:#111111;" onclick="selectColor(this)" title="Obsidian"></div>
-                <div class="color-swatch" data-color="#7c3aed" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);" onclick="selectColor(this)" title="Violet"></div>
-                <div class="color-swatch" data-color="#0284c7" style="background:linear-gradient(135deg,#38bdf8,#0284c7);" onclick="selectColor(this)" title="Electric"></div>
-                <div class="color-swatch" data-color="#be123c" style="background:linear-gradient(135deg,#fb7185,#be123c);" onclick="selectColor(this)" title="Rose"></div>
-                <div class="color-swatch" data-color="#047857" style="background:linear-gradient(135deg,#34d399,#047857);" onclick="selectColor(this)" title="Emerald"></div>
-                <div class="color-swatch" data-color="#b45309" style="background:linear-gradient(135deg,#fbbf24,#b45309);" onclick="selectColor(this)" title="Amber"></div>
+        <!-- DESIGN TAB -->
+        <div id="design" class="tab-content">
+            <p class="section-label">Dot Patterns</p>
+            <div class="preset-grid">
+                <div class="style-tile active" onclick="selectStyle(this, 'square')"><div class="preview-icon">■</div><span>Square</span></div>
+                <div class="style-tile" onclick="selectStyle(this, 'rounded')"><div class="preview-icon">●</div><span>Rounded</span></div>
+                <div class="style-tile" onclick="selectStyle(this, 'dots')"><div class="preview-icon">...</div><span>Dots</span></div>
+                <div class="style-tile" onclick="selectStyle(this, 'extra-rounded')"><div class="preview-icon">(( ))</div><span>Liquid</span></div>
+                <div class="style-tile" onclick="selectStyle(this, 'classy')"><div class="preview-icon">◆</div><span>Classy</span></div>
+                <div class="style-tile" onclick="selectStyle(this, 'classy-rounded')"><div class="preview-icon">❃</div><span>Artistic</span></div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <p class="section-label">Color System</p>
+                <div class="color-pickers">
+                    <div class="color-item">
+                        <label>Foreground</label>
+                        <input type="color" id="color-dots" value="#000000" onchange="updateDesign()">
+                    </div>
+                    <div class="color-item">
+                        <label>Background</label>
+                        <input type="color" id="color-bg" value="#ffffff" onchange="updateDesign()">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <p class="section-label">Gradient Flow</p>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="check-gradient" onchange="updateDesign()" style="width: auto;">
+                    <label for="check-gradient" style="font-size: 13px;">Enable Linear Gradient</label>
+                </div>
+                <input type="color" id="color-grad" value="#8b5cf6" onchange="updateDesign()" style="margin-top: 8px;">
             </div>
         </div>
 
-        <!-- Input -->
-        <div>
-            <label class="field-label" for="payload">Payload</label>
-            <div class="input-wrap">
-                <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-                </svg>
-                <input type="text" id="payload" placeholder="https://example.com" spellcheck="false" autocomplete="off">
+        <!-- BRANDING TAB -->
+        <div id="branding" class="tab-content">
+            <p class="section-label">Logo Overlay</p>
+            <div class="logo-upload-box" onclick="document.getElementById('logo-file').click()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-bottom: 8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <p style="font-size: 12px; font-weight: 500;">Click to upload icon</p>
+                <p id="logo-status" style="font-size: 10px; color: var(--text-dim); margin-top: 4px;">Supports PNG, JPG, SVG</p>
+                <input type="file" id="logo-file" hidden accept="image/*" onchange="handleLogo(event)">
+            </div>
+
+            <div style="margin-top: 24px;">
+                <button class="action-btn" style="width: 100%;" onclick="clearLogo()">Remove Current Logo</button>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <p class="section-label">Logo Configuration</p>
+                <div class="input-group">
+                    <label>Logo Softness (0.1 - 0.5)</label>
+                    <input type="range" id="logo-size" min="0.1" max="0.5" step="0.05" value="0.3" oninput="updateDesign()">
+                </div>
             </div>
         </div>
 
-        <!-- Generate -->
-        <button class="btn-gen" id="gen-btn" onclick="generate()">
-            <span class="btn-label">
-                <svg style="width:15px;height:15px;vertical-align:middle;margin-right:6px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
-                </svg>
-                Generate Code
-            </span>
-            <div class="spinner"></div>
-        </button>
-
+        <div style="padding: 16px; border-top: 1px solid var(--border); margin-top: auto;">
+            <button class="action-btn" style="width: 100%; background: var(--accent); color: #fff; border: none; font-weight: 700;" onclick="handleGenerate()">GENERATE QR CODE</button>
+        </div>
     </div>
 </div>
 
-<!-- Footer -->
-<p class="footer">Engineered by <span>Sanket Dhengre</span> · QR Studio Pro</p>
+<div id="toast"></div>
 
-<!-- Toast -->
-<div class="toast" id="toast">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    <span id="toast-msg"></span>
-</div>
-
+<!-- JS DOMAIN -->
 <script>
-// ─── State ───────────────────────────────────────────────────────────────────
-let currentStyle = 'classic';
-let currentColor = '#111111';
-let qrInstance   = null;
-let debounceTimer = null;
+    // ─── Constants & State ───────────────────────────────────────────
+    let qrStyled = null;
+    let selectedType = 'url';
+    let selectedStyle = 'square';
+    let logoData = null;
+    let history = JSON.parse(localStorage.getItem('qr_history') || '[]');
 
-// ─── Style Config Factory ─────────────────────────────────────────────────────
-function getConfig(style, color, data) {
-    const base = { data, width: 206, height: 206, margin: 10, qrOptions: { errorCorrectionLevel: 'H' } };
-
-    const PURPLE_GRAD = {
-        type: 'linear', rotation: Math.PI / 4,
-        colorStops: [{ offset: 0, color: '#8b5cf6' }, { offset: 1, color: '#3b82f6' }]
+    const fieldsConfig = {
+        url:  [{ id: 'f-url', label: 'Website URL', type: 'text', placeholder: 'https://example.com' }],
+        text: [{ id: 'f-text', label: 'Plain Text Message', type: 'textarea', placeholder: 'Enter your message...' }],
+        wifi: [
+            { id: 'f-ssid', label: 'SSID / Network Name', type: 'text', placeholder: 'Home WiFi' },
+            { id: 'f-pass', label: 'Password', type: 'text', placeholder: '••••••••' },
+            { id: 'f-enc',  label: 'Encryption', type: 'select', options: ['WPA/WPA2', 'WEP', 'None'] }
+        ],
+        vcard: [
+            { id: 'f-name',  label: 'Full Name', type: 'text', placeholder: 'John Doe' },
+            { id: 'f-phone', label: 'Phone', type: 'text', placeholder: '+1 234 567 890' },
+            { id: 'f-email', label: 'Email', type: 'text', placeholder: 'john@example.com' },
+            { id: 'f-org',   label: 'Organization', type: 'text', placeholder: 'Acme Corp' }
+        ]
     };
 
-    const configs = {
-        classic: {
-            dotsOptions:          { type: 'square',        color },
-            cornersSquareOptions: { type: 'square',        color },
-            cornersDotOptions:    { type: 'square',        color },
-            backgroundOptions:    { color: '#ffffff' }
-        },
-        rounded: {
-            dotsOptions:          { type: 'extra-rounded', color },
-            cornersSquareOptions: { type: 'extra-rounded', color },
-            cornersDotOptions:    { type: 'dot',           color },
-            backgroundOptions:    { color: '#ffffff' }
-        },
-        dots: {
-            dotsOptions:          { type: 'dots',          color },
-            cornersSquareOptions: { type: 'dot',           color },
-            cornersDotOptions:    { type: 'dot',           color },
-            backgroundOptions:    { color: '#ffffff' }
-        },
-        gradient: {
-            dotsOptions:          { type: 'rounded',       gradient: PURPLE_GRAD },
-            cornersSquareOptions: { type: 'extra-rounded', gradient: PURPLE_GRAD },
-            cornersDotOptions:    { type: 'dot',           color: '#8b5cf6' },
-            backgroundOptions:    { color: '#ffffff' }
-        },
-        classy: {
-            dotsOptions:          { type: 'classy',        color },
-            cornersSquareOptions: { type: 'extra-rounded', color },
-            cornersDotOptions:    { type: 'dot',           color },
-            backgroundOptions:    { color: '#ffffff' }
-        },
-        dark: {
-            dotsOptions:          { type: 'extra-rounded', color: '#f1f1f3' },
-            cornersSquareOptions: { type: 'extra-rounded', color: '#f1f1f3' },
-            cornersDotOptions:    { type: 'dot',           color: '#f1f1f3' },
-            backgroundOptions:    { color: '#0d0d10' }
+    // ─── Initialization ──────────────────────────────────────────────
+    window.onload = () => {
+        switchType('url');
+        renderHistory();
+        checkUrlParams();
+    };
+
+    function switchTab(e, tabId) {
+        document.querySelectorAll('.tab-trigger').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        document.getElementById(tabId).classList.add('active');
+    }
+
+    function switchType(type) {
+        selectedType = type;
+        document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+        event?.currentTarget?.classList.add('active');
+        
+        const container = document.getElementById('fields-container');
+        container.innerHTML = fieldsConfig[type].map(f => `
+            <div class="input-group">
+                <label>${f.label}</label>
+                ${f.type === 'select' ? 
+                    `<select id="${f.id}">${f.options.map(o => `<option>${o}</option>`)}</select>` :
+                    f.type === 'textarea' ?
+                    `<textarea id="${f.id}" placeholder="${f.placeholder}" rows="4"></textarea>` :
+                    `<input type="text" id="${f.id}" placeholder="${f.placeholder}">`
+                }
+            </div>
+        `).join('');
+    }
+
+    function selectStyle(el, style) {
+        selectedStyle = style;
+        document.querySelectorAll('.style-tile').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        updateDesign();
+    }
+
+    // ─── Logic ───────────────────────────────────────────────────────
+    function getPayload() {
+        if(selectedType === 'url') return document.getElementById('f-url').value;
+        if(selectedType === 'text') return document.getElementById('f-text').value;
+        if(selectedType === 'wifi') {
+            const s = document.getElementById('f-ssid').value;
+            const p = document.getElementById('f-pass').value;
+            const t = document.getElementById('f-enc').value === 'None' ? 'nopass' : document.getElementById('f-enc').value;
+            return `WIFI:S:${s};T:${t};P:${p};;`;
         }
-    };
+        if(selectedType === 'vcard') {
+            const n = document.getElementById('f-name').value;
+            const ph = document.getElementById('f-phone').value;
+            const em = document.getElementById('f-email').value;
+            const org = document.getElementById('f-org').value;
+            return `BEGIN:VCARD\nVERSION:3.0\nN:${n}\nORG:${org}\nTEL:${ph}\nEMAIL:${em}\nEND:VCARD`;
+        }
+    }
 
-    return { ...base, ...(configs[style] || configs.classic) };
-}
+    function handleGenerate() {
+        const data = getPayload();
+        if(!data || data.trim().length === 0) {
+            showToast("Enter some content first!");
+            return;
+        }
 
-// ─── Generate ─────────────────────────────────────────────────────────────────
-function generate() {
-    const text   = document.getElementById('payload').value.trim();
-    const btn    = document.getElementById('gen-btn');
-    const input  = document.getElementById('payload');
-    const frame  = document.getElementById('qr-frame');
-    const canvas = document.getElementById('qr-canvas');
-    const ph     = document.getElementById('placeholder');
-    const scanLine = document.getElementById('scan-line');
+        const options = buildOptions(data);
+        const container = document.getElementById('canvas-buffer');
+        container.innerHTML = '';
+        
+        qrStyled = new QRCodeStyling(options);
+        qrStyled.append(container);
 
-    if (!text) {
-        input.style.transition = 'transform 0.08s';
-        ['−12px','12px','−8px','8px','0'].forEach((v, i) =>
-            setTimeout(() => input.style.transform = `translateX(${v})`, i * 70)
-        );
+        document.getElementById('qr-frame').classList.add('active');
+        document.getElementById('btn-copy').disabled = false;
+        document.getElementById('btn-download-png').disabled = false;
+        document.getElementById('btn-download-svg').disabled = false;
+
+        saveToHistory(data);
+    }
+
+    function buildOptions(data) {
+        const dotColor = document.getElementById('color-dots').value;
+        const bgColor = document.getElementById('color-bg').value;
+        const useGrad = document.getElementById('check-gradient').checked;
+        const gradColor = document.getElementById('color-grad').value;
+        const logoSize = parseFloat(document.getElementById('logo-size').value);
+
+        const options = {
+            width: 280,
+            height: 280,
+            data: data,
+            margin: 10,
+            qrOptions: { typeNumber: 0, mode: 'Byte', errorCorrectionLevel: 'Q' },
+            imageOptions: { hideBackgroundDots: true, imageSize: logoSize, margin: 10 },
+            dotsOptions: {
+                type: selectedStyle,
+                color: dotColor,
+                gradient: useGrad ? {
+                    type: 'linear',
+                    rotation: 0,
+                    colorStops: [{ offset: 0, color: dotColor }, { offset: 1, color: gradColor }]
+                } : null
+            },
+            backgroundOptions: { color: bgColor },
+            image: logoData
+        };
+        return options;
+    }
+
+    function updateDesign() {
+        if(!qrStyled) return;
+        const data = getPayload();
+        qrStyled.update(buildOptions(data));
+    }
+
+    // ─── Branding ────────────────────────────────────────────────────
+    function handleLogo(e) {
+        const file = e.target.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            logoData = e.target.result;
+            document.getElementById('logo-status').innerText = "Logo Loaded: " + file.name;
+            updateDesign();
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function clearLogo() {
+        logoData = null;
+        document.getElementById('logo-status').innerText = "Supports PNG, JPG, SVG";
+        updateDesign();
+    }
+
+    // ─── Actions ─────────────────────────────────────────────────────
+    function toggleFrame() {
+        const frame = document.getElementById('qr-frame');
+        frame.classList.toggle('framed');
+    }
+
+    async function copyToClipboard() {
+        try {
+            const blob = await qrStyled.getRawData('png');
+            await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+            showToast('Copied to system clipboard!');
+        } catch(e) { showToast('Error copying. Try Download.'); }
+    }
+
+    function downloadHandler(ext) {
+        qrStyled.download({ name: 'qr_studio_export', extension: ext });
+    }
+
+    function shareWorkspace() {
+        const params = new URLSearchParams();
+        params.set('type', selectedType);
+        params.set('style', selectedStyle);
+        // Pack first field as data
+        const firstField = fieldsConfig[selectedType][0].id;
+        params.set('data', document.getElementById(firstField).value);
+        
+        const url = window.location.origin + window.location.pathname + '?' + params.toString();
+        navigator.clipboard.writeText(url);
+        showToast('Configuration link copied!');
+    }
+
+    function useTemplate(tpl) {
+        switchType('url');
+        const input = document.getElementById('f-url');
+        if(tpl === 'github') input.value = 'https://github.com/';
+        if(tpl === 'linkedin') input.value = 'https://linkedin.com/in/';
+        if(tpl === 'whatsapp') input.value = 'https://wa.me/';
         input.focus();
-        return;
     }
 
-    btn.classList.add('loading');
-    canvas.classList.remove('show');
-
-    // Trigger scan animation
-    frame.classList.add('scanning');
-
-    setTimeout(() => {
-        canvas.innerHTML = '';
-
-        qrInstance = new QRCodeStyling(getConfig(currentStyle, currentColor, text));
-        qrInstance.append(canvas);
-
-        setTimeout(() => {
-            frame.classList.add('lit');
-            frame.classList.remove('scanning');
-            ph.style.opacity = '0';
-            canvas.classList.add('show');
-            btn.classList.remove('loading');
-
-            // Enable action buttons
-            document.getElementById('copy-btn').disabled = false;
-            document.getElementById('download-btn').disabled = false;
-        }, 280);
-    }, 300);
-}
-
-// ─── Style Selector ───────────────────────────────────────────────────────────
-function selectStyle(el) {
-    document.querySelectorAll('.style-tile').forEach(b => b.classList.remove('active'));
-    el.classList.add('active');
-    currentStyle = el.dataset.style;
-}
-
-// ─── Color Selector ───────────────────────────────────────────────────────────
-function selectColor(el) {
-    document.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
-    el.classList.add('active');
-    currentColor = el.dataset.color;
-}
-
-// ─── Download ─────────────────────────────────────────────────────────────────
-function downloadQR() {
-    if (!qrInstance) return;
-    qrInstance.download({ name: 'qr-studio-code', extension: 'png' });
-    showToast('QR code downloaded!');
-}
-
-// ─── Copy ─────────────────────────────────────────────────────────────────────
-async function copyQR() {
-    if (!qrInstance) return;
-    try {
-        const blob = await qrInstance.getRawData('png');
-        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        showToast('Copied to clipboard!');
-    } catch {
-        showToast('Copy not supported — try Download instead.');
+    // ─── History ─────────────────────────────────────────────────────
+    function saveToHistory(data) {
+        if(history.includes(data)) return;
+        history.unshift(data);
+        if(history.length > 5) history.pop();
+        localStorage.setItem('qr_history', JSON.stringify(history));
+        renderHistory();
     }
-}
 
-// ─── Toast ────────────────────────────────────────────────────────────────────
-let toastTimer;
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    document.getElementById('toast-msg').textContent = msg;
-    t.classList.add('show');
-    clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
-}
+    async function renderHistory() {
+        const container = document.getElementById('history-container');
+        container.innerHTML = history.map((item, idx) => `
+            <div class="history-item" onclick="loadHistory('${item}')" title="${item}">
+                <div id="hist-qr-${idx}" style="width:100%; height:100%"></div>
+            </div>
+        `).join('');
 
-// ─── Live Preview (debounced) ─────────────────────────────────────────────────
-document.getElementById('payload').addEventListener('input', () => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-        if (document.getElementById('payload').value.trim()) generate();
-    }, 600);
-});
+        // Generate tiny previews
+        history.forEach((item, idx) => {
+            new QRCodeStyling({
+                width: 50, height: 50, data: item, margin: 2,
+                dotsOptions: { type: 'square', color: '#000' }
+            }).append(document.getElementById(`hist-qr-${idx}`));
+        });
+    }
 
-// ─── Keyboard shortcut ────────────────────────────────────────────────────────
-document.getElementById('payload').addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') { e.preventDefault(); generate(); }
-});
+    function loadHistory(item) {
+        switchType('url'); // Default to URL for simplicity in loading history
+        document.getElementById('f-url').value = item;
+        handleGenerate();
+    }
+
+    // ─── Utils ───────────────────────────────────────────────────────
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.classList.add('visible');
+        setTimeout(() => t.classList.remove('visible'), 3000);
+    }
+
+    function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('data')) {
+            const type = urlParams.get('type') || 'url';
+            switchType(type);
+            const firstField = fieldsConfig[type][0].id;
+            document.getElementById(firstField).value = urlParams.get('data');
+            // Wait for DOM to catch up or just handle it
+            setTimeout(() => handleGenerate(), 100);
+        }
+    }
 </script>
 </body>
 </html>
