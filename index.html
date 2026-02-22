@@ -341,27 +341,49 @@
                 grid-template-columns: 1fr;
                 height: 100dvh;
                 max-height: none;
-                padding: 12px;
+                padding: 16px;
                 display: flex;
                 flex-direction: column;
+                gap: 16px;
                 overflow-y: auto;
+                overflow-x: hidden;
             }
 
             .display-panel {
-                padding: 24px 20px;
-                gap: 20px;
+                padding: 32px 20px;
+                gap: 24px;
+                flex-shrink: 0;
             }
 
             .qr-viewport {
-                width: 200px;
-                height: 200px;
+                width: 220px;
+                height: 220px;
+            }
+
+            .controls-panel {
+                flex: 1;
+                min-height: 500px;
+                margin-bottom: 80px; /* Space for sticky button */
             }
 
             .nav-tabs {
                 position: sticky;
                 top: 0;
-                z-index: 10;
+                z-index: 100;
                 background: var(--card-bg);
+            }
+
+            .bottom-bar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                padding: 16px 24px calc(16px + var(--safe-area));
+                background: rgba(20, 20, 22, 0.85);
+                backdrop-filter: saturate(180%) blur(20px);
+                -webkit-backdrop-filter: saturate(180%) blur(20px);
+                z-index: 1000;
+                border-top: 1px solid var(--card-border);
             }
         }
 
@@ -454,7 +476,7 @@
                         <div class="style-item active" id="dot-square" onclick="setDotType('square')">
                             <span class="icon">■</span><span>Square</span>
                         </div>
-                        <div class="style-item" id="dot-rounded" onclick="setDotType('extra-rounded')">
+                        <div class="style-item" id="dot-extra-rounded" onclick="setDotType('extra-rounded')">
                             <span class="icon">●</span><span>Rounded</span>
                         </div>
                         <div class="style-item" id="dot-dots" onclick="setDotType('dots')">
@@ -466,7 +488,7 @@
                         <div class="style-item" id="dot-classy-rounded" onclick="setDotType('classy-rounded')">
                             <span class="icon">❃</span><span>Artistic</span>
                         </div>
-                        <div class="style-item" id="dot-liquid" onclick="setDotType('rounded')">
+                        <div class="style-item" id="dot-rounded" onclick="setDotType('rounded')">
                             <span class="icon">〰</span><span>Liquid</span>
                         </div>
                     </div>
@@ -532,7 +554,7 @@
     let debounce = null;
 
     const inputModels = {
-        url: [{ id: 'url', label: 'Website Address', placeholder: 'apple.com' }],
+        url: [{ id: 'url', label: 'website address or text', placeholder: 'website address or text' }],
         wifi: [
             { id: 'ssid', label: 'Network Name', placeholder: 'WiFi SSID' },
             { id: 'pass', label: 'Password', placeholder: 'WPA2 Password' }
@@ -575,7 +597,8 @@
     function setDotType(type) {
         activeDotType = type;
         document.querySelectorAll('#pane-style .style-item').forEach(i => i.classList.remove('active'));
-        document.getElementById(`dot-${type.replace('-rounded', '-rounded')}`).classList.add('active'); // CSS fix
+        const el = document.getElementById(`dot-${type}`);
+        if(el) el.classList.add('active');
         renderLive();
     }
 
@@ -607,14 +630,14 @@
         qr.append(container);
 
         // UI state toggle
-        document.getElementById('btn-copy').disabled = false;
-        document.getElementById('btn-png').disabled = false;
-        document.getElementById('btn-svg').disabled = false;
-        document.getElementById('placeholder-text').classList.add('hidden');
+        const bCopy = document.getElementById('btn-copy'); if(bCopy) bCopy.disabled = false;
+        const bPng = document.getElementById('btn-png'); if(bPng) bPng.disabled = false;
+        const bSvg = document.getElementById('btn-svg'); if(bSvg) bSvg.disabled = false;
+        const ph = document.getElementById('placeholder-text'); if(ph) ph.classList.add('hidden');
     }
 
     function getFinalData() {
-        if(activeType === 'url') return document.getElementById('in-url').value || 'https://apple.com';
+        if(activeType === 'url') return document.getElementById('in-url').value || 'Hey there, my name is Sanket Dhengre';
         if(activeType === 'wifi') {
             const s = document.getElementById('in-ssid').value || 'Network';
             const p = document.getElementById('in-pass').value || 'Pass';
